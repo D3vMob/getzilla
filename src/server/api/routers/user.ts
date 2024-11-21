@@ -45,8 +45,8 @@ export const userRouter = createTRPCRouter({
       z.object({
         userId: z.string(),
         email: z.string().email(),
-        firstName: z.string().optional(),
-        lastName: z.string().optional(),
+        firstName: z.string().nullable(),
+        lastName: z.string().nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -58,12 +58,13 @@ export const userRouter = createTRPCRouter({
           role: "worker",
         },
       });
+
       // Create user in local database
       return ctx.db.insert(users).values({
         clerkId: input.userId,
         email: input.email,
-        firstName: input.firstName ?? null,
-        lastName: input.lastName ?? null,
+        firstName: input.firstName,
+        lastName: input.lastName,
         role: "worker",
         createdAt: new Date(),
         updatedAt: new Date(),
