@@ -80,6 +80,8 @@ export const users = createTable(
     clerkId: varchar("clerkId", { length: 256 }).unique().notNull(),
     email: varchar("email", { length: 256 }).unique().notNull(),
     nickname: varchar("nickname", { length: 256 }),
+    firstName: varchar("first_name", { length: 256 }),
+    lastName: varchar("last_name", { length: 256 }),
     personalInfo: text("personal_info"),
     role: roleEnum("role").default("worker").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
