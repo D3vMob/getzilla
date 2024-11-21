@@ -4,6 +4,12 @@ import { tasks } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
 
 export const taskRouter = createTRPCRouter({
+  latestTask: publicProcedure.query(async ({ ctx }) => {
+    const task = await ctx.db.query.tasks.findFirst({
+      orderBy: (tasks, { desc }) => [desc(tasks.createdAt)],
+    });
+    return task;
+  }),
   getTasks: publicProcedure.query(async ({ ctx }) => {
     const tasks = await ctx.db.query.tasks.findMany({
       with: {

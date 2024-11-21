@@ -1,8 +1,8 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { db } from "~/server/db";
-import { users } from "~/server/db/schema";
-import { eq } from "drizzle-orm";
+// import { db } from "~/server/db";
+// import { users } from "~/server/db/schema";
+// import { eq } from "drizzle-orm";
 import { WebhookEvent } from "@clerk/nextjs/server";
 
 export async function POST(req: Request) {
@@ -20,11 +20,11 @@ export async function POST(req: Request) {
   }
 
   // Get the body
-  const payload = await req.json();
+  const payload = await req.json() as unknown;
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your webhook secret
-  const wh = new Webhook(process.env.WEBHOOK_SECRET || "");
+  const wh = new Webhook(process.env.WEBHOOK_SECRET ?? "");
 
   let evt: WebhookEvent;
 
