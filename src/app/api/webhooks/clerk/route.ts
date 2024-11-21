@@ -3,8 +3,8 @@ import { headers } from "next/headers";
 import { db } from "~/server/db";
 import { users } from "~/server/db/schema";
 import { eq } from "drizzle-orm";
-import { WebhookEvent } from "@clerk/nextjs/server";
-import { Role } from "~/hooks/useRole";
+import type { WebhookEvent } from "@clerk/nextjs/server";
+import type { Role } from "~/hooks/useRole";
 import { env } from "~/env";
 
 export async function POST(req: Request) {
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const { id, email_addresses, public_metadata, username } = evt.data;
     // Create the user in your database
     await db.insert(users).values({
-      clerkId: id as string,
+      clerkId: id,
       email: email_addresses[0]?.email_address ?? "", // Ensure email is not undefined
       nickname: username ?? null, // Use null instead of undefined
       role: (public_metadata.role as Role) ?? "worker", // Default to worker if no role specified

@@ -2,7 +2,7 @@ import Image from "next/image";
 
 import logo from "../assets/logo_lg_gray.png";
 
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
   // const hello = await api.post.hello({ text: "from tRPC" });
