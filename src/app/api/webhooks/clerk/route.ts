@@ -1,9 +1,11 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-// import { db } from "~/server/db";
-// import { users } from "~/server/db/schema";
-// import { eq } from "drizzle-orm";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { db } from "~/server/db";
+import { users } from "~/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { WebhookEvent } from "@clerk/nextjs/server";
+import type { Role } from "~/hooks/useRole";
+import { env } from "~/env";
 
 export async function POST(req: Request) {
   // Get the headers
@@ -20,11 +22,11 @@ export async function POST(req: Request) {
   }
 
   // Get the body
-  const payload = await req.json() as unknown;
+  const payload = (await req.json()) as unknown;
   const body = JSON.stringify(payload);
 
   // Create a new Svix instance with your webhook secret
-  const wh = new Webhook(process.env.WEBHOOK_SECRET ?? "");
+  const wh = new Webhook(env.WEBHOOK_SECRET);
 
   let evt: WebhookEvent;
 
@@ -47,30 +49,29 @@ export async function POST(req: Request) {
 
   if (eventType === "user.created") {
     const { id, email_addresses, public_metadata, username } = evt.data;
-
     // Create the user in your database
-    // await db.insert(users).values({
-    //   clerkId: id,
-    //   email: email_addresses[0]?.email_address,
-    //   nickname: username ?? undefined,
-    //   role: (public_metadata.role as string) ?? "worker", // Default to worker if no role specified
-    // });
+    await db.insert(users).values({
+      clerkId: id,
+      email: email_addresses[0]?.email_address ?? "", // Ensure email is not undefined
+      nickname: username ?? null, // Use null instead of undefined
+      role: (public_metadata.role as Role) ?? "worker", // Default to worker if no role specified
+    });
   }
 
   // Handle role updates
-//   if (eventType === "user.updated") {
-//     const { id, public_metadata } = evt.data;
+  if (eventType === "user.updated") {
+    const { id, public_metadata } = evt.data;
 
-//     if (public_metadata.role) {
-//       await db
-//         .update(users)
-//         .set({
-//           role: public_metadata.role as string,
-//           updatedAt: new Date(),
-//         })
-//         .where(eq(users.clerkId, id));
-//     }
-//   }
+    if (public_metadata.role) {
+      await db
+        .update(users)
+        .set({
+          role: public_metadata.role as Role,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.clerkId, id));
+    }
+  }
 
   return new Response("", { status: 200 });
 }
