@@ -60,7 +60,7 @@ export const userRouter = createTRPCRouter({
       });
       // Create user in local database
       return ctx.db.insert(users).values({
-        clerkId: input.userId as string,
+        clerkId: input.userId,
         email: input.email,
         firstName: input.firstName ?? null,
         lastName: input.lastName ?? null,
