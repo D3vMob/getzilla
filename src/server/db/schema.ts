@@ -61,15 +61,27 @@ export const statusEnum = pgEnum("getzilla_status", [
   "Done",
 ]);
 
+// Add role enum
+export const roleEnum = pgEnum("getzilla_role", [
+  "superuser",
+  "admin",
+  "manager",
+  "worker",
+  "external_worker",
+  "consultant",
+  "concierge",
+]);
+
 // Tables
 export const users = createTable(
   "user",
   {
     id: integer("id").primaryKey().generatedByDefaultAsIdentity(),
-    clerkId: varchar("clerk_id", { length: 256 }).unique().notNull(),
+    clerkId: varchar("clerkId", { length: 256 }).unique().notNull(),
     email: varchar("email", { length: 256 }).unique().notNull(),
     nickname: varchar("nickname", { length: 256 }),
     personalInfo: text("personal_info"),
+    role: roleEnum("role").default("worker").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
@@ -78,8 +90,9 @@ export const users = createTable(
     ),
   },
   (table) => ({
-    clerkIdIndex: index("clerk_id_idx").on(table.clerkId),
+    clerkIdIndex: index("clerkId_idx").on(table.clerkId),
     emailIndex: index("email_idx").on(table.email),
+    roleIndex: index("role_idx").on(table.role),
   })
 );
 
